@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 99)
 
 set(SRC_FILES
     src/1.c
-    src/utils.c
 )
 
 include_directories(include vendor)
