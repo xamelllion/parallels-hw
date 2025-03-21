@@ -1,0 +1,23 @@
+name: Parallels hw
+
+on:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: lint
+        run: |
+          sudo chmod u+x ./scripts/ci-style-check.sh
+          ./scripts/ci-style-check.sh
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          sudo apt install build-essential clang
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPILER=clang -GNinja -Bbuild
+          cmake --build build -j4
