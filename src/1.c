@@ -1,29 +1,14 @@
-#include <stddef.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include <stb_image.h>
+#include <stb_image_write.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <types.h>
-#include <utils.h>
 
-void inverse_image(file_info file_info) {
-    header_struct hs;
-    info_header ih;
-
-    memcpy(&hs, file_info.file, 14);
-    memcpy(&ih, file_info.file + 14, 40);
-
-    printf("size : %d\n", ih.size);
-    printf("width : %d\n", ih.width);
-    printf("height : %d\n", ih.height);
-    printf("bitcount : %d\n", ih.bitcount);
-    printf("compression : %d\n", ih.compression);
-    printf("imageSize : %d\n", ih.imageSize);
-    printf("colorsUsed : %d\n", ih.colorsUsed);
-    printf("colorsImportant : %d\n", ih.colorsImportant);
-
-    char* start = file_info.file + 14 + ih.size;
-    for (ssize_t i = 0; i < ih.imageSize / 4; i++) {
-        pixel_struct* pixel = (pixel_struct*)(&start[i * 4]);
+void inverse_image(unsigned char* pixel_array, size_t pixel_count) {
+    for (ssize_t i = 0; i < pixel_count; i++) {
+        pixel_struct* pixel = (pixel_struct*)(&pixel_array[i * 3]);
         pixel->r = 255 - pixel->r;
         pixel->g = 255 - pixel->g;
         pixel->b = 255 - pixel->b;
@@ -31,9 +16,10 @@ void inverse_image(file_info file_info) {
 }
 
 int main() {
-    file_info image_file = read_file("examples/image.bmp");
-    inverse_image(image_file);
-    write_file("examples/result.bmp", image_file);
+    int w, h, n;
+    unsigned char* data = stbi_load("examples/image.bmp", &w, &h, &n, 3);
+    printf("%d %d %d\n", w, h, n);
 
-    free(image_file.file);
+    inverse_image(data, w * h);
+    stbi_write_png("examples/result.png", w, h, 3, data, w * 3);
 }
