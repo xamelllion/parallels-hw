@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SRC_DIR="src"
+INCLUDE_DIR="include"
 
 if [ ! -d "$SRC_DIR" ]; then
     echo "Error: Directory '$SRC_DIR' not found."
@@ -8,4 +9,6 @@ if [ ! -d "$SRC_DIR" ]; then
 fi
 
 files=$(find "$SRC_DIR" -type f \( -name "*.c" -o -name "*.h" \))
-clang-format --Werror --dry-run -i $files
+headers=$(find "$INCLUDE_DIR" -type f \( -name "*.h" \))
+
+clang-format --Werror --dry-run -i $files $headers
