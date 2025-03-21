@@ -8,6 +8,8 @@ set(SRC_FILES
     src/utils.c
 )
 
-include_directories(include)
+include_directories(include vendor)
 
 add_executable(1 ${SRC_FILES})
+target_link_libraries(1 PRIVATE m)
+
