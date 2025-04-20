@@ -4,11 +4,12 @@ project(MyExecutable C)
 set(CMAKE_C_STANDARD 99)
 
 set(SRC_FILES
-    src/1.c
+    src/main.c
+    src/serial-conv.c
+    vendor/argparse.c
 )
 
 include_directories(include vendor)
 
-add_executable(1 ${SRC_FILES})
-target_link_libraries(1 PRIVATE m)
-
+add_executable(main ${SRC_FILES})
+target_link_libraries(main PRIVATE m)
