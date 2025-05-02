@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 99)
 set(SRC_FILES
     src/main.c
     src/serial-conv.c
+    src/filters.c
     vendor/argparse.c
 )
 
