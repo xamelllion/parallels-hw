@@ -1,3 +1,4 @@
+#include <parallel-conv.h>
 #include <serial-conv.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,8 +7,8 @@
 #include "argparse.h"
 
 typedef enum {
-    S,  //< serial mode
-    P   //< parallel mode
+    SerialMode,
+    ParallelMode,
 } pwh_mode;
 
 typedef struct {
@@ -53,9 +54,9 @@ void parse_arguments(int argc, const char** argv, phw_options* options) {
 
     if (mode != NULL) {
         if (strcmp(mode, "S") == 0)
-            options->mode = S;
+            options->mode = SerialMode;
         else if (strcmp(mode, "P") == 0)
-            options->mode = P;
+            options->mode = ParallelMode;
         else {
             printf("Argument 'mode' must have value S or P\n");
             exit(1);
@@ -69,10 +70,10 @@ int main(int argc, const char** argv) {
     phw_options options = {.read_path = "", .write_path = ""};
     parse_arguments(argc, argv, &options);
 
-    if (options.mode == S) {
+    if (options.mode == SerialMode) {
         serial_run(options.read_path, options.write_path);
-    } else {
-        printf("Parallel mode is not supported\n");
+    } else if (options.mode == ParallelMode) {
+        parallel_run(options.read_path, options.write_path);
     }
 
     return 0;
