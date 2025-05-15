@@ -2,4 +2,4 @@
 
 #include <pct/utils.h>
 
-void parallel_run(const struct pct_options options);
+void parallel_run(const struct pct_options options, const struct filter* filters);
