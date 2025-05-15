@@ -1,4 +1,4 @@
-# Parallels hw
+# pct - parallel convolution tool
 
 ## Конфигурация
 ```

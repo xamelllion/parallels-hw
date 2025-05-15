@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(parallel-conv C)
+project(pct C)
 set(CMAKE_C_STANDARD 99)
 
 set(SRC_FILES
     src/main.c
-    src/serial-conv.c
-    src/parallel-conv.c
-    src/pthreads-conv.c
-    src/filters.c
+    src/pct/serial-conv.c
+    src/pct/parallel-conv.c
+    src/pct/pthreads-conv.c
+    src/pct/filters.c
     vendor/argparse.c
 )
 
@@ -27,5 +27,5 @@ else()
     message(STATUS "Building in RELEASE mode")
 endif()
 
-add_executable(parallel-conv ${SRC_FILES})
-target_link_libraries(parallel-conv PRIVATE m OpenMP::OpenMP_C)
+add_executable(pct ${SRC_FILES})
+target_link_libraries(pct PRIVATE m OpenMP::OpenMP_C)
