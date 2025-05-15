@@ -1,6 +1,6 @@
-#include <parallel-conv.h>
-#include <pthreads-conv.h>
-#include <serial-conv.h>
+#include <pct/parallel-conv.h>
+#include <pct/pthreads-conv.h>
+#include <pct/serial-conv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

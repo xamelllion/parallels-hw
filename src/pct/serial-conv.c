@@ -1,8 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include <filters.h>
-#include <serial-conv.h>
+#include <pct/filters.h>
+#include <pct/serial-conv.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <stdlib.h>

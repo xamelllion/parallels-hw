@@ -1,6 +1,6 @@
 #pragma once
 
-#include <filters.h>
+#include <pct/filters.h>
 #include <pthread.h>
 
 // Структура для представления пикселя

@@ -1,7 +1,7 @@
-#include <filters.h>
 #include <omp.h>
-#include <parallel-conv.h>
-#include <pthreads-conv.h>
+#include <pct/filters.h>
+#include <pct/parallel-conv.h>
+#include <pct/pthreads-conv.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <stdlib.h>
