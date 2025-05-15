@@ -1,6 +1,7 @@
-#include <pct/filters.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <pct/filters.h>
 
 double blur_filter_matrix[5][5] = {
     {0, 0, 1, 0, 0},  //

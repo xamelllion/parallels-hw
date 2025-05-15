@@ -1,11 +1,12 @@
-#include <pct/parallel-conv.h>
-#include <pct/serial-conv.h>
-#include <pct/utils.h>
+#include "argparse.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "argparse.h"
+#include <pct/parallel-conv.h>
+#include <pct/serial-conv.h>
+#include <pct/utils.h>
 
 void parse_arguments(int argc, const char** argv, struct pct_options* options) {
     const char* mode = NULL;

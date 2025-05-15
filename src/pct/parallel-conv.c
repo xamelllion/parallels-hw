@@ -1,8 +1,9 @@
-#include <pct/filters.h>
-#include <pct/utils.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <pct/filters.h>
+#include <pct/utils.h>
 
 void* parallel_convolution(void* arg) {
     struct convolution_task* task = (struct convolution_task*)arg;

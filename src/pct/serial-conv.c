@@ -1,8 +1,9 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include <pct/filters.h>
 #include <pct/serial-conv.h>
 #include <pct/utils.h>
-#include <stdlib.h>
-#include <string.h>
 
 void serial_convolution(struct rgb_image* image, int w, int h, struct filter filter) {
     struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
