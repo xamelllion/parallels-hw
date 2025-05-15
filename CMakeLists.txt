@@ -7,16 +7,14 @@ set(SRC_FILES
     src/main.c
     src/pct/serial-conv.c
     src/pct/parallel-conv.c
-    src/pct/pthreads-conv.c
     src/pct/filters.c
+    src/pct/utils.c
     vendor/argparse.c
 )
 
 include_directories(include vendor)
 
-find_package(OpenMP COMPONENTS C REQUIRED)
-
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release")
+set(CMAKE_BUILD_TYPE "Release")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -28,4 +26,4 @@ else()
 endif()
 
 add_executable(pct ${SRC_FILES})
-target_link_libraries(pct PRIVATE m OpenMP::OpenMP_C)
+target_link_libraries(pct PRIVATE m)

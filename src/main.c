@@ -1,41 +1,21 @@
 #include <pct/parallel-conv.h>
-#include <pct/pthreads-conv.h>
 #include <pct/serial-conv.h>
+#include <pct/utils.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "argparse.h"
 
-typedef enum {
-    seq_mode,
-    pixel_mode,
-    row_mode,
-    column_mode,
-    grid_mode,
-} pwh_mode;
-
-typedef struct {
-    char read_path[256];
-    char write_path[256];
-    pwh_mode mode;
-} phw_options;
-
-void required_argument_error_handler(const char* name) {
-    printf("Argument '%s' is required!\n", name);
-    exit(1);
-}
-
-void parse_arguments(int argc, const char** argv, phw_options* options) {
-    const char* read_path = NULL;
-    const char* write_path = NULL;
+void parse_arguments(int argc, const char** argv, struct pct_options* options) {
     const char* mode = NULL;
 
     struct argparse_option argparse_options[] = {
         OPT_HELP(),
-        OPT_STRING('i', "input", &read_path, "image to read", NULL, 0, 0),
-        OPT_STRING('o', "output", &write_path, "path to save result", NULL, 0, 0),
-        OPT_STRING('m', "mode", &mode, "[S]erial/[P]arallel mode", NULL, 0, 0),
+        OPT_STRING('i', "input", &options->read_path, "image to read", NULL, 0, 0),
+        OPT_STRING('o', "output", &options->write_path, "path to save result", NULL, 0, 0),
+        OPT_STRING('m', "mode", &mode, "mode: seq, pixel, row, column, grid", NULL, 0, 0),
+        OPT_INTEGER('t', "threads", &options->threads, "number of threads", NULL, 0, 0),
         OPT_END(),
     };
 
@@ -44,16 +24,12 @@ void parse_arguments(int argc, const char** argv, phw_options* options) {
     argparse_describe(&argparse, NULL, NULL);
     argc = argparse_parse(&argparse, argc, argv);
 
-    if (read_path != NULL) {
-        strcpy(options->read_path, read_path);
-    } else {
-        required_argument_error_handler("input");
+    if (options->read_path == NULL) {
+        error("Missing required argument: 'input'\n");
     }
 
-    if (write_path != NULL) {
-        strcpy(options->write_path, write_path);
-    } else {
-        required_argument_error_handler("output");
+    if (options->write_path == NULL) {
+        error("Missing required argument: 'output'\n");
     }
 
     if (mode != NULL) {
@@ -67,23 +43,28 @@ void parse_arguments(int argc, const char** argv, phw_options* options) {
             options->mode = column_mode;
         else if (strcmp(mode, "grid") == 0)
             options->mode = grid_mode;
-        else {
-            printf("Argument 'mode' must have unknown value\n");
-            exit(1);
-        }
+        else
+            error("Argument 'mode' has unknown value\n");
     } else {
-        required_argument_error_handler("mode");
+        error("Missing required argument: 'mode'\n");
+    }
+
+    if (options->threads == -1) {
+        error("Missing required argument: 'threads'\n");
     }
 }
 
 int main(int argc, const char** argv) {
-    phw_options options = {.read_path = "", .write_path = ""};
+    struct pct_options options = {
+        .threads = -1,
+    };
+
     parse_arguments(argc, argv, &options);
 
     if (options.mode == seq_mode) {
-        serial_run(options.read_path, options.write_path);
-    } else if (options.mode == row_mode) {
-        parallel_run(options.read_path, options.write_path);
+        serial_run(options);
+    } else {
+        parallel_run(options);
     }
 
     return 0;

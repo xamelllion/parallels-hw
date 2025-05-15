@@ -1,24 +1,11 @@
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
 #include <pct/filters.h>
 #include <pct/serial-conv.h>
-#include <stb_image.h>
-#include <stb_image_write.h>
+#include <pct/utils.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
-
-void convolution(unsigned char* pixel_array, int w, int h, struct filter filter) {
-    struct pixel {
-        unsigned char r;
-        unsigned char g;
-        unsigned char b;
-    };
-
-    struct pixel* result = malloc(w * h * 3);
-    struct pixel* image = (struct pixel*)pixel_array;
+void serial_convolution(struct rgb_image* image, int w, int h, struct filter filter) {
+    struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
@@ -41,13 +28,12 @@ void convolution(unsigned char* pixel_array, int w, int h, struct filter filter)
         }
     }
 
-    memcpy(pixel_array, result, w * h * 3);
+    memcpy(image, result, w * h * 3);
     free(result);
 }
 
-void serial_run(const char* read_path, const char* write_path) {
-    int w, h, n;
-    unsigned char* data = stbi_load(read_path, &w, &h, &n, 3);
+void serial_run(const struct pct_options options) {
+    struct image_info info = load_image(options.read_path);
 
     struct filter motion_blur = {
         .factor = 1.0 / 9.0,
@@ -56,8 +42,8 @@ void serial_run(const char* read_path, const char* write_path) {
         .filter = copy_filter_matrix(9, motion_blur_filter_matrix),
     };
 
-    convolution(data, w, h, motion_blur);
+    serial_convolution(info.image, info.width, info.height, motion_blur);
 
-    stbi_write_png(write_path, w, h, 3, data, w * 3);
+    dump_image(options.write_path, info);
     free_filter_matrix(&motion_blur);
 }
