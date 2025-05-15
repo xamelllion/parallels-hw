@@ -1,4 +1,5 @@
 #include <parallel-conv.h>
+#include <pthreads-conv.h>
 #include <serial-conv.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,8 +8,11 @@
 #include "argparse.h"
 
 typedef enum {
-    SerialMode,
-    ParallelMode,
+    seq_mode,
+    pixel_mode,
+    row_mode,
+    column_mode,
+    grid_mode,
 } pwh_mode;
 
 typedef struct {
@@ -53,12 +57,18 @@ void parse_arguments(int argc, const char** argv, phw_options* options) {
     }
 
     if (mode != NULL) {
-        if (strcmp(mode, "S") == 0)
-            options->mode = SerialMode;
-        else if (strcmp(mode, "P") == 0)
-            options->mode = ParallelMode;
+        if (strcmp(mode, "seq") == 0)
+            options->mode = seq_mode;
+        else if (strcmp(mode, "pixel") == 0)
+            options->mode = pixel_mode;
+        else if (strcmp(mode, "row") == 0)
+            options->mode = row_mode;
+        else if (strcmp(mode, "column") == 0)
+            options->mode = column_mode;
+        else if (strcmp(mode, "grid") == 0)
+            options->mode = grid_mode;
         else {
-            printf("Argument 'mode' must have value S or P\n");
+            printf("Argument 'mode' must have unknown value\n");
             exit(1);
         }
     } else {
@@ -70,9 +80,9 @@ int main(int argc, const char** argv) {
     phw_options options = {.read_path = "", .write_path = ""};
     parse_arguments(argc, argv, &options);
 
-    if (options.mode == SerialMode) {
+    if (options.mode == seq_mode) {
         serial_run(options.read_path, options.write_path);
-    } else if (options.mode == ParallelMode) {
+    } else if (options.mode == row_mode) {
         parallel_run(options.read_path, options.write_path);
     }
 

@@ -20,8 +20,8 @@ void convolution(unsigned char* pixel_array, int w, int h, struct filter filter)
     struct pixel* result = malloc(w * h * 3);
     struct pixel* image = (struct pixel*)pixel_array;
 
-    for (int x = 0; x < w; x++) {
-        for (int y = 0; y < h; y++) {
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
             double red = 0.0, green = 0.0, blue = 0.0;
 
             for (int filterY = 0; filterY < filter.size; filterY++) {
