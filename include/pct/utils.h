@@ -46,6 +46,7 @@ enum pct_mode {
 struct pct_options {
     char* read_path;
     char* write_path;
+    enum pct_filter_type filter_type;
     enum pct_mode mode;
     int threads;
 };

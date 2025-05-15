@@ -222,26 +222,22 @@ void grid_convolution(struct rgb_image* image, int w, int h, struct filter filte
     free(tasks);
 }
 
-void parallel_run(const struct pct_options options) {
+void parallel_run(const struct pct_options options, const struct filter* filters) {
     struct image_info info = load_image(options.read_path);
 
-    struct filter motion_blur = {
-        .factor = 1.0 / 9.0,
-        .bias = 0.0,
-        .size = 9,
-        .filter = copy_filter_matrix(9, motion_blur_filter_matrix),
-    };
-
     if (options.mode == pixel_mode) {
-        pixelwise_convolution(info.image, info.width, info.height, motion_blur, options.threads);
+        pixelwise_convolution(info.image, info.width, info.height, filters[options.filter_type],
+                              options.threads);
     } else if (options.mode == row_mode) {
-        row_convolution(info.image, info.width, info.height, motion_blur, options.threads);
+        row_convolution(info.image, info.width, info.height, filters[options.filter_type],
+                        options.threads);
     } else if (options.mode == column_mode) {
-        column_convolution(info.image, info.width, info.height, motion_blur, options.threads);
+        column_convolution(info.image, info.width, info.height, filters[options.filter_type],
+                           options.threads);
     } else if (options.mode == grid_mode) {
-        grid_convolution(info.image, info.width, info.height, motion_blur, options.threads);
+        grid_convolution(info.image, info.width, info.height, filters[options.filter_type],
+                         options.threads);
     }
 
     dump_image(options.write_path, info);
-    free_filter_matrix(&motion_blur);
 }
