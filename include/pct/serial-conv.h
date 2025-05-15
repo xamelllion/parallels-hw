@@ -1,3 +1,5 @@
 #pragma once
 
-void serial_run(const char* read_path, const char* write_path);
+#include <pct/utils.h>
+
+void serial_run(const struct pct_options options);

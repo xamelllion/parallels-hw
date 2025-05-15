@@ -1,3 +1,5 @@
 #pragma once
 
-void parallel_run(const char* read_path, const char* write_path);
+#include <pct/utils.h>
+
+void parallel_run(const struct pct_options options);
