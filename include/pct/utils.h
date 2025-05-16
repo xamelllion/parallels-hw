@@ -21,6 +21,7 @@ struct image_info {
     int width;
     int height;
     struct rgb_image* image;
+    struct rgb_image* result;
 };
 
 struct convolution_task {
