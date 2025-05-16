@@ -7,6 +7,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(unity)
 
 set(SRC_FILES
+    test-runner.c
     serial-conv.c
     utils.c
 )
