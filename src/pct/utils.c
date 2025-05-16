@@ -17,5 +17,6 @@ struct image_info load_image(const char* read_path) {
 }
 
 void dump_image(const char* write_path, struct image_info info) {
-    stbi_write_png(write_path, info.width, info.height, 3, info.image, info.width * 3);
+    stbi_write_png(write_path, info.width, info.height, 3, info.result, info.width * 3);
+    free(info.image);
 }

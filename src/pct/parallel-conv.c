@@ -39,11 +39,13 @@ void* parallel_convolution(void* arg) {
 }
 
 // 1. Попиксельное разделение
-void pixelwise_convolution(struct rgb_image* image, int w, int h, struct filter filter,
-                           int num_threads) {
-    struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
+void pixelwise_convolution(struct image_info* info, struct filter filter, int num_threads) {
+    info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
     struct convolution_task* tasks = malloc(num_threads * sizeof(struct convolution_task));
+
+    int w = info->width;
+    int h = info->height;
 
     int pixels_per_thread = (w * h) / num_threads;
     int extra_pixels = (w * h) % num_threads;
@@ -52,8 +54,8 @@ void pixelwise_convolution(struct rgb_image* image, int w, int h, struct filter 
     for (int i = 0; i < num_threads; i++) {
         int pixels_for_this_thread = pixels_per_thread + (i < extra_pixels ? 1 : 0);
 
-        tasks[i].image = image;
-        tasks[i].result = result;
+        tasks[i].image = info->image;
+        tasks[i].result = info->result;
         tasks[i].w = w;
         tasks[i].h = h;
         tasks[i].filter = filter;
@@ -79,24 +81,25 @@ void pixelwise_convolution(struct rgb_image* image, int w, int h, struct filter 
         pthread_join(threads[i], NULL);
     }
 
-    memcpy(image, result, w * h * sizeof(struct rgb_image));
-    free(result);
     free(threads);
     free(tasks);
 }
 
 // 2. Разделение по строкам
-void row_convolution(struct rgb_image* image, int w, int h, struct filter filter, int num_threads) {
-    struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
+void row_convolution(struct image_info* info, struct filter filter, int num_threads) {
+    info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
     struct convolution_task* tasks = malloc(num_threads * sizeof(struct convolution_task));
+
+    int w = info->width;
+    int h = info->height;
 
     int rows_per_thread = h / num_threads;
     int extra_rows = h % num_threads;
 
     for (int i = 0; i < num_threads; i++) {
-        tasks[i].image = image;
-        tasks[i].result = result;
+        tasks[i].image = info->image;
+        tasks[i].result = info->result;
         tasks[i].w = w;
         tasks[i].h = h;
         tasks[i].filter = filter;
@@ -117,25 +120,25 @@ void row_convolution(struct rgb_image* image, int w, int h, struct filter filter
         pthread_join(threads[i], NULL);
     }
 
-    memcpy(image, result, w * h * sizeof(struct rgb_image));
-    free(result);
     free(threads);
     free(tasks);
 }
 
 // 3. Разделение по столбцам
-void column_convolution(struct rgb_image* image, int w, int h, struct filter filter,
-                        int num_threads) {
-    struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
+void column_convolution(struct image_info* info, struct filter filter, int num_threads) {
+    info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
     struct convolution_task* tasks = malloc(num_threads * sizeof(struct convolution_task));
+
+    int w = info->width;
+    int h = info->height;
 
     int cols_per_thread = w / num_threads;
     int extra_cols = w % num_threads;
 
     for (int i = 0; i < num_threads; i++) {
-        tasks[i].image = image;
-        tasks[i].result = result;
+        tasks[i].image = info->image;
+        tasks[i].result = info->result;
         tasks[i].w = w;
         tasks[i].h = h;
         tasks[i].filter = filter;
@@ -156,18 +159,18 @@ void column_convolution(struct rgb_image* image, int w, int h, struct filter fil
         pthread_join(threads[i], NULL);
     }
 
-    memcpy(image, result, w * h * sizeof(struct rgb_image));
-    free(result);
     free(threads);
     free(tasks);
 }
 
 // 4. Произвольная прямоугольная решётка
-void grid_convolution(struct rgb_image* image, int w, int h, struct filter filter,
-                      int num_threads) {
-    struct rgb_image* result = malloc(w * h * sizeof(struct rgb_image));
+void grid_convolution(struct image_info* info, struct filter filter, int num_threads) {
+    info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
     struct convolution_task* tasks = malloc(num_threads * sizeof(struct convolution_task));
+
+    int w = info->width;
+    int h = info->height;
 
     // Вычисляем оптимальное разделение на прямоугольники
     int grid_width = 1;
@@ -194,8 +197,8 @@ void grid_convolution(struct rgb_image* image, int w, int h, struct filter filte
             int thread_idx = i * grid_height + j;
             if (thread_idx >= num_threads) break;
 
-            tasks[thread_idx].image = image;
-            tasks[thread_idx].result = result;
+            tasks[thread_idx].image = info->image;
+            tasks[thread_idx].result = info->result;
             tasks[thread_idx].w = w;
             tasks[thread_idx].h = h;
             tasks[thread_idx].filter = filter;
@@ -216,8 +219,6 @@ void grid_convolution(struct rgb_image* image, int w, int h, struct filter filte
         pthread_join(threads[i], NULL);
     }
 
-    memcpy(image, result, w * h * sizeof(struct rgb_image));
-    free(result);
     free(threads);
     free(tasks);
 }
@@ -226,17 +227,13 @@ void parallel_run(const struct pct_options options, const struct filter* filters
     struct image_info info = load_image(options.read_path);
 
     if (options.mode == pixel_mode) {
-        pixelwise_convolution(info.image, info.width, info.height, filters[options.filter_type],
-                              options.threads);
+        pixelwise_convolution(&info, filters[options.filter_type], options.threads);
     } else if (options.mode == row_mode) {
-        row_convolution(info.image, info.width, info.height, filters[options.filter_type],
-                        options.threads);
+        row_convolution(&info, filters[options.filter_type], options.threads);
     } else if (options.mode == column_mode) {
-        column_convolution(info.image, info.width, info.height, filters[options.filter_type],
-                           options.threads);
+        column_convolution(&info, filters[options.filter_type], options.threads);
     } else if (options.mode == grid_mode) {
-        grid_convolution(info.image, info.width, info.height, filters[options.filter_type],
-                         options.threads);
+        grid_convolution(&info, filters[options.filter_type], options.threads);
     }
 
     dump_image(options.write_path, info);
