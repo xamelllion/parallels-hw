@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(pct C)
 set(CMAKE_C_STANDARD 99)
 
-set(CMAKE_BUILD_TYPE "Release")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
