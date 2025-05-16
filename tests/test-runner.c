@@ -1,9 +1,11 @@
 #include <unity.h>
 
-extern void test_1();
+extern void identity_serial_test();
+extern void compose_filters_serial_test();
 
 int main() {
     UNITY_BEGIN();
-    RUN_TEST(test_1);
+    RUN_TEST(identity_serial_test);
+    RUN_TEST(compose_filters_serial_test);
     return UNITY_END();
 }
