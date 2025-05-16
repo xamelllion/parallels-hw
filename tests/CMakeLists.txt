@@ -12,5 +12,4 @@ set(SRC_FILES
 )
 
 add_executable(test-runner ${SRC_FILES})
-
 target_link_libraries(test-runner unity pct-lib)
