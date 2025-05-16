@@ -1,4 +1,4 @@
-name: Parallels hw
+name: pct - parallel convolution tool
 
 on:
   push:
@@ -19,5 +19,15 @@ jobs:
       - name: build
         run: |
           sudo apt install build-essential clang
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPILER=clang -GNinja -Bbuild
+          cmake -DCMAKE_C_COMPILER=clang -GNinja -Bbuild
           cmake --build build -j4
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          sudo apt install build-essential clang
+          cmake -DCMAKE_C_COMPILER=clang -GNinja -Bbuild
+          cmake --build build -j4
+          ./build/tests/test-runner
