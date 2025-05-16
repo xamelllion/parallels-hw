@@ -3,17 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(pct C)
 set(CMAKE_C_STANDARD 99)
 
-set(SRC_FILES
-    src/main.c
-    src/pct/serial-conv.c
-    src/pct/parallel-conv.c
-    src/pct/filters.c
-    src/pct/utils.c
-    vendor/argparse.c
-)
-
-include_directories(include vendor)
-
 set(CMAKE_BUILD_TYPE "Release")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
@@ -25,5 +14,7 @@ else()
     message(STATUS "Building in RELEASE mode")
 endif()
 
-add_executable(pct ${SRC_FILES})
-target_link_libraries(pct PRIVATE m)
+include_directories(include vendor)
+
+add_subdirectory(src)
+add_subdirectory(tests)
