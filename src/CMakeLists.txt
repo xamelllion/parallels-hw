@@ -1,5 +1,4 @@
 set(SRC_FILES
-    main.c
     pct/serial-conv.c
     pct/parallel-conv.c
     pct/filters.c
@@ -7,8 +6,8 @@ set(SRC_FILES
     ../vendor/argparse.c
 )
 
-add_executable(pct ${SRC_FILES})
 add_library(pct-lib STATIC ${SRC_FILES})
-
-target_link_libraries(pct PRIVATE m)
 target_link_libraries(pct-lib PRIVATE m)
+
+add_executable(pct main.c)
+target_link_libraries(pct PRIVATE pct-lib)
