@@ -31,15 +31,31 @@ int compare_images(struct rgb_image* expected, struct rgb_image* actual, int wid
     return 1;
 }
 
-struct filter _create_empty_filter(int size) {
+struct filter create_empty_filter(int size) {
+    struct filter result = {
+        .size = size,
+        .factor = 1.0,
+        .bias = 0.0,
+        .filter = (double**)malloc(size * sizeof(double*)),
+    };
+
+    for (int i = 0; i < size; i++) {
+        result.filter[i] = (double*)calloc(size, sizeof(double));
+    }
+
+    return result;
+}
+
+struct filter create_filter(int size, double factor, double bias, const double filter[size][size]) {
     struct filter result;
     result.size = size;
-    result.factor = 1.0;
-    result.bias = 0.0;
+    result.factor = factor;
+    result.bias = bias;
 
     result.filter = (double**)malloc(size * sizeof(double*));
     for (int i = 0; i < size; i++) {
         result.filter[i] = (double*)calloc(size, sizeof(double));
+        memcpy(result.filter[i], filter[i], size * sizeof(double));
     }
 
     return result;
@@ -48,7 +64,7 @@ struct filter _create_empty_filter(int size) {
 struct filter filter_composition(const struct filter* f1, const struct filter* f2) {
     int new_size = f1->size + f2->size - 1;
 
-    struct filter composed = _create_empty_filter(new_size);
+    struct filter composed = create_empty_filter(new_size);
 
     for (int i = 0; i < new_size; i++) {
         for (int j = 0; j < new_size; j++) {
@@ -72,7 +88,7 @@ struct filter filter_composition(const struct filter* f1, const struct filter* f
 }
 
 struct filter generate_random_filter(int size) {
-    struct filter random_filter = _create_empty_filter(size);
+    struct filter random_filter = create_empty_filter(size);
 
     srand(time(NULL));
 
@@ -95,10 +111,50 @@ struct filter generate_random_filter(int size) {
     return random_filter;
 }
 
+struct filter expand_filter(const struct filter* original, int padding) {
+    int new_size = original->size + 2 * padding;
+
+    struct filter expanded = create_empty_filter(new_size);
+    expanded.factor = original->factor;
+    expanded.bias = original->bias;
+
+    int offset = padding;
+    for (int i = 0; i < original->size; i++) {
+        for (int j = 0; j < original->size; j++) {
+            expanded.filter[i + offset][j + offset] = original->filter[i][j];
+        }
+    }
+
+    return expanded;
+}
+
+void prepare_image_for_relaunch(struct image_info* info) {
+    free(info->image);
+    info->image = info->result;
+    info->result = NULL;
+}
+
 void free_filter(struct filter* filter) {
     for (int i = 0; i < filter->size; i++) {
         free(filter->filter[i]);
     }
 
     free(filter->filter);
+}
+
+struct image_info copy_image_info(struct image_info* info) {
+    struct image_info copy = {
+        .width = info->width,
+        .height = info->height,
+        .image = malloc(info->width * info->height * sizeof(struct rgb_image)),
+    };
+
+    memcpy(copy.image, info->image, info->width * info->height * sizeof(struct rgb_image));
+
+    return copy;
+}
+
+void free_image_info(struct image_info* info) {
+    free(info->image);
+    free(info->result);
 }
