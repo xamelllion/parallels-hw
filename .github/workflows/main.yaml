@@ -30,4 +30,5 @@ jobs:
           sudo apt install build-essential clang
           cmake -DCMAKE_C_COMPILER=clang -GNinja -Bbuild
           cmake --build build -j4
-          ./build/tests/test-runner
+          sudo chmod u+x ./scripts/run-tests.sh
+          ./scripts/run-tests.sh

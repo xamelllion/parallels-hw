@@ -1,4 +1,3 @@
-
 #include "utils.h"
 
 #include <stdio.h>
@@ -151,4 +150,13 @@ void run_zero_padding_filter_test() {
         printf("Run on %dx%d image\n", image_size, image_size);
         zero_padding_filter_test(image_size, image_size);
     }
+}
+
+int main() {
+    UNITY_BEGIN();
+    RUN_TEST(run_identity_serial_test);
+    RUN_TEST(run_filter_composition_test);
+    RUN_TEST(run_compose_filters_into_identity_test);
+    RUN_TEST(run_zero_padding_filter_test);
+    return UNITY_END();
 }

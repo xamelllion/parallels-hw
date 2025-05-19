@@ -6,11 +6,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(unity)
 
-set(SRC_FILES
-    test-runner.c
-    serial-conv.c
-    utils.c
-)
+add_executable(serial-conv-test serial-conv.c utils.c)
+target_link_libraries(serial-conv-test unity pct-lib)
 
-add_executable(test-runner ${SRC_FILES})
-target_link_libraries(test-runner unity pct-lib)
+add_executable(parallel-conv-test parallel-conv.c utils.c)
+target_link_libraries(parallel-conv-test unity pct-lib)
