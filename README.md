@@ -94,11 +94,6 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild
    ./build/src/pct -i photo.png -o edges.png -f ed -m grid
    ```
 
-3. Run performance tests:
-   ```bash
-   ./scripts/run-tests.sh
-   ```
-
 ## Testing
 
 Run the test suite with:
