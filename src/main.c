@@ -71,7 +71,9 @@ void parse_arguments(int argc, const char** argv, struct pct_options* options) {
     }
 
     if (options->threads == -1) {
-        error("Missing required argument: 'threads'\n");
+        if (mode != seq_mode) {
+            options->threads = get_thread_count();
+        }
     }
 }
 

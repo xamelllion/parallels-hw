@@ -92,3 +92,6 @@ struct image_info load_image(const char* read_path);
  * @note This tool supports only PNG images
  */
 void dump_image(const char* write_path, struct image_info info);
+
+/// Get the optimal number of threads for the current system
+int get_thread_count();

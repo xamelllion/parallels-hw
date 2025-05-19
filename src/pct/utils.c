@@ -5,6 +5,7 @@
 #include "stb_image_write.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include <pct/filters.h>
 #include <pct/utils.h>
@@ -19,4 +20,8 @@ struct image_info load_image(const char* read_path) {
 void dump_image(const char* write_path, struct image_info info) {
     stbi_write_png(write_path, info.width, info.height, 3, info.result, info.width * 3);
     free(info.image);
+}
+
+int get_thread_count() {
+    return (int)sysconf(_SC_NPROCESSORS_ONLN);
 }
