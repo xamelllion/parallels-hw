@@ -38,21 +38,31 @@ void* parallel_convolution(void* arg) {
     return NULL;
 }
 
-// 1. Попиксельное разделение
 void pixelwise_convolution(struct image_info* info, struct filter filter, int num_threads) {
     info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
     struct convolution_task* tasks = malloc(num_threads * sizeof(struct convolution_task));
 
-    int w = info->width;
-    int h = info->height;
+    const int w = info->width;
+    const int h = info->height;
+    const int total_pixels = w * h;
 
-    int pixels_per_thread = (w * h) / num_threads;
-    int extra_pixels = (w * h) % num_threads;
+    int pixels_per_thread = total_pixels / num_threads;
+    int remaining_pixels = total_pixels % num_threads;
 
-    int current_pixel = 0;
+    int start_pixel = 0;
     for (int i = 0; i < num_threads; i++) {
-        int pixels_for_this_thread = pixels_per_thread + (i < extra_pixels ? 1 : 0);
+        int end_pixel = start_pixel + pixels_per_thread + (i < remaining_pixels ? 1 : 0);
+
+        tasks[i].start_x = start_pixel % w;
+        tasks[i].start_y = start_pixel / w;
+        tasks[i].end_x = (end_pixel - 1) % w + 1;
+        tasks[i].end_y = end_pixel / w;
+
+        if (tasks[i].end_y >= h) {
+            tasks[i].end_y = h;
+            tasks[i].end_x = w;
+        }
 
         tasks[i].image = info->image;
         tasks[i].result = info->result;
@@ -60,21 +70,9 @@ void pixelwise_convolution(struct image_info* info, struct filter filter, int nu
         tasks[i].h = h;
         tasks[i].filter = filter;
 
-        // Вычисляем координаты для каждого пикселя
-        int end_pixel = current_pixel + pixels_for_this_thread;
-        tasks[i].start_x = current_pixel % w;
-        tasks[i].start_y = current_pixel / w;
-        tasks[i].end_x = end_pixel % w;
-        tasks[i].end_y = end_pixel / w;
-
-        // Корректировка для последнего пикселя
-        if (i == num_threads - 1) {
-            tasks[i].end_x = w;
-            tasks[i].end_y = h;
-        }
-
         pthread_create(&threads[i], NULL, parallel_convolution, &tasks[i]);
-        current_pixel = end_pixel;
+
+        start_pixel = end_pixel;
     }
 
     for (int i = 0; i < num_threads; i++) {
@@ -85,7 +83,6 @@ void pixelwise_convolution(struct image_info* info, struct filter filter, int nu
     free(tasks);
 }
 
-// 2. Разделение по строкам
 void row_convolution(struct image_info* info, struct filter filter, int num_threads) {
     info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
@@ -124,7 +121,6 @@ void row_convolution(struct image_info* info, struct filter filter, int num_thre
     free(tasks);
 }
 
-// 3. Разделение по столбцам
 void column_convolution(struct image_info* info, struct filter filter, int num_threads) {
     info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
@@ -163,7 +159,6 @@ void column_convolution(struct image_info* info, struct filter filter, int num_t
     free(tasks);
 }
 
-// 4. Произвольная прямоугольная решётка
 void grid_convolution(struct image_info* info, struct filter filter, int num_threads) {
     info->result = malloc(info->width * info->height * sizeof(struct rgb_image));
     pthread_t* threads = malloc(num_threads * sizeof(pthread_t));
