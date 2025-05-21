@@ -20,6 +20,7 @@ void parse_arguments(int argc, const char** argv, struct pct_options* options) {
         OPT_STRING('f', "filter", &filter, "filter: id, bl, mb, ed, sr", NULL, 0, 0),
         OPT_STRING('m', "mode", &mode, "mode: seq, pixel, row, column, grid", NULL, 0, 0),
         OPT_INTEGER('t', "threads", &options->threads, "number of threads", NULL, 0, 0),
+        OPT_BOOLEAN('l', "log", &options->log, "write logs", NULL, 0, 0),
         OPT_END(),
     };
 
@@ -80,6 +81,7 @@ void parse_arguments(int argc, const char** argv, struct pct_options* options) {
 int main(int argc, const char** argv) {
     struct pct_options options = {
         .threads = -1,
+        .log = 0,
     };
 
     parse_arguments(argc, argv, &options);

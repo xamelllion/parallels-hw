@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -221,6 +222,7 @@ void grid_convolution(struct image_info* info, struct filter filter, int num_thr
 void parallel_run(const struct pct_options options, const struct filter* filters) {
     struct image_info info = load_image(options.read_path);
 
+    double start_time = get_time_in_seconds();
     if (options.mode == pixel_mode) {
         pixelwise_convolution(&info, filters[options.filter_type], options.threads);
     } else if (options.mode == row_mode) {
@@ -229,6 +231,11 @@ void parallel_run(const struct pct_options options, const struct filter* filters
         column_convolution(&info, filters[options.filter_type], options.threads);
     } else if (options.mode == grid_mode) {
         grid_convolution(&info, filters[options.filter_type], options.threads);
+    }
+    double end_time = get_time_in_seconds();
+
+    if (options.log) {
+        printf("convolution time: %lf\n", end_time - start_time);
     }
 
     dump_image(options.write_path, info);

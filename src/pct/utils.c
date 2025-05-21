@@ -1,3 +1,4 @@
+#include <time.h>
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
@@ -24,4 +25,13 @@ void dump_image(const char* write_path, struct image_info info) {
 
 int get_thread_count() {
     return (int)sysconf(_SC_NPROCESSORS_ONLN);
+}
+
+double get_time_in_seconds() {
+    struct timespec time;
+    if (clock_gettime(CLOCK_MONOTONIC, &time) != 0) {
+        return -1;
+    }
+
+    return (double)time.tv_sec + (double)time.tv_nsec / 1e9;
 }

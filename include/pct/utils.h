@@ -75,6 +75,7 @@ struct pct_options {
     enum pct_filter_type filter_type;  ///< Filter type to apply
     enum pct_mode mode;                ///< Processing mode
     int threads;                       ///< Number of threads to use
+    int log;                           ///< Logging status
 };
 
 /**
@@ -95,3 +96,6 @@ void dump_image(const char* write_path, struct image_info info);
 
 /// Get the optimal number of threads for the current system
 int get_thread_count();
+
+/// Gets the current monotonic time in seconds
+double get_time_in_seconds();

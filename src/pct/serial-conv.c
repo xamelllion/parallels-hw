@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <pct/filters.h>
@@ -38,7 +39,13 @@ void serial_convolution(struct image_info* info, struct filter filter) {
 void serial_run(const struct pct_options options, const struct filter* filters) {
     struct image_info info = load_image(options.read_path);
 
+    double start_time = get_time_in_seconds();
     serial_convolution(&info, filters[options.filter_type]);
+    double end_time = get_time_in_seconds();
+
+    if (options.log) {
+        printf("convolution time: %lf\n", end_time - start_time);
+    }
 
     dump_image(options.write_path, info);
 }
