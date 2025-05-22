@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pct/filters.h>
 #include <pct/utils.h>
 
 /**
@@ -14,4 +15,4 @@
  * @note The function assumes proper initialization of both options and filters.
  *
  */
-void serial_run(const struct pct_options options, const struct filter* filters);
+void serial_run(struct pct_options options, const struct filter* filters);

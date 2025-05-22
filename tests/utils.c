@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 
+#include <pct/filters.h>
 #include <pct/utils.h>
 
 struct rgb_image* generate_image(int width, int height) {

@@ -11,7 +11,9 @@ void* parallel_convolution(void* arg) {
 
     for (int y = task->start_y; y < task->end_y; y++) {
         for (int x = task->start_x; x < task->end_x; x++) {
-            double red = 0.0, green = 0.0, blue = 0.0;
+            double red = 0.0;
+            double green = 0.0;
+            double blue = 0.0;
 
             for (int filterY = 0; filterY < task->filter.size; filterY++) {
                 for (int filterX = 0; filterX < task->filter.size; filterX++) {
@@ -189,7 +191,9 @@ void grid_convolution(struct image_info* info, struct filter filter, int num_thr
     for (int i = 0; i < grid_width; i++) {
         for (int j = 0; j < grid_height; j++) {
             int thread_idx = i * grid_height + j;
-            if (thread_idx >= num_threads) break;
+            if (thread_idx >= num_threads) {
+                break;
+            }
 
             tasks[thread_idx].image = info->image;
             tasks[thread_idx].result = info->result;
@@ -199,11 +203,15 @@ void grid_convolution(struct image_info* info, struct filter filter, int num_thr
 
             tasks[thread_idx].start_x = i * block_width;
             tasks[thread_idx].end_x = tasks[thread_idx].start_x + block_width;
-            if (i == grid_width - 1) tasks[thread_idx].end_x += extra_width;
+            if (i == grid_width - 1) {
+                tasks[thread_idx].end_x += extra_width;
+            }
 
             tasks[thread_idx].start_y = j * block_height;
             tasks[thread_idx].end_y = tasks[thread_idx].start_y + block_height;
-            if (j == grid_height - 1) tasks[thread_idx].end_y += extra_height;
+            if (j == grid_height - 1) {
+                tasks[thread_idx].end_y += extra_height;
+            }
 
             pthread_create(&threads[thread_idx], NULL, parallel_convolution, &tasks[thread_idx]);
         }

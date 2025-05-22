@@ -38,34 +38,34 @@ void parse_arguments(int argc, const char** argv, struct pct_options* options) {
     }
 
     if (filter != NULL) {
-        if (strcmp(filter, "id") == 0)
+        if (strcmp(filter, "id") == 0) {
             options->filter_type = id_filter_type;
-        else if (strcmp(filter, "bl") == 0)
+        } else if (strcmp(filter, "bl") == 0) {
             options->filter_type = blur_filter_type;
-        else if (strcmp(filter, "mb") == 0)
+        } else if (strcmp(filter, "mb") == 0) {
             options->filter_type = mb_filter_type;
-        else if (strcmp(filter, "ed") == 0)
+        } else if (strcmp(filter, "ed") == 0) {
             options->filter_type = edges_filter_type;
-        else if (strcmp(filter, "sr") == 0)
+        } else if (strcmp(filter, "sr") == 0) {
             options->filter_type = sharpen_filter_type;
-        else
+        } else
             error("Argument 'filter' has unknown value\n");
     } else {
         error("Missing required argument: 'filter'\n");
     }
 
     if (mode != NULL) {
-        if (strcmp(mode, "seq") == 0)
+        if (strcmp(mode, "seq") == 0) {
             options->mode = seq_mode;
-        else if (strcmp(mode, "pixel") == 0)
+        } else if (strcmp(mode, "pixel") == 0) {
             options->mode = pixel_mode;
-        else if (strcmp(mode, "row") == 0)
+        } else if (strcmp(mode, "row") == 0) {
             options->mode = row_mode;
-        else if (strcmp(mode, "column") == 0)
+        } else if (strcmp(mode, "column") == 0) {
             options->mode = column_mode;
-        else if (strcmp(mode, "grid") == 0)
+        } else if (strcmp(mode, "grid") == 0) {
             options->mode = grid_mode;
-        else
+        } else
             error("Argument 'mode' has unknown value\n");
     } else {
         error("Missing required argument: 'mode'\n");

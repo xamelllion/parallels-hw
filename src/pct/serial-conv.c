@@ -13,7 +13,9 @@ void serial_convolution(struct image_info* info, struct filter filter) {
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            double red = 0.0, green = 0.0, blue = 0.0;
+            double red = 0.0;
+            double green = 0.0;
+            double blue = 0.0;
 
             for (int filterY = 0; filterY < filter.size; filterY++) {
                 for (int filterX = 0; filterX < filter.size; filterX++) {

@@ -44,7 +44,7 @@ const double sharpen_filter_matrix[3][3] = {
     {-1, -1, -1},  //
 };
 
-double** _copy_filter_matrix(int size, const double matrix[size][size]) {
+double** copy_filter_matrix(int size, const double matrix[size][size]) {
     double** result;
 
     result = malloc(size * sizeof(double*));
@@ -56,7 +56,7 @@ double** _copy_filter_matrix(int size, const double matrix[size][size]) {
     return result;
 }
 
-void _free_filter_matrix(struct filter* filter) {
+void free_filter_matrix(struct filter* filter) {
     for (int i = 0; i < filter->size; i++) {
         free(filter->filter[i]);
     }
@@ -71,35 +71,35 @@ struct filter* init_filters() {
         .factor = 1.0,
         .bias = 0.0,
         .size = 3,
-        .filter = _copy_filter_matrix(3, id_filter_matrix),
+        .filter = copy_filter_matrix(3, id_filter_matrix),
     };
 
     filters[blur_filter_type] = (struct filter){
         .factor = 1.0 / 13.0,
         .bias = 0.0,
         .size = 5,
-        .filter = _copy_filter_matrix(5, blur_filter_matrix),
+        .filter = copy_filter_matrix(5, blur_filter_matrix),
     };
 
     filters[mb_filter_type] = (struct filter){
         .factor = 1.0 / 9.0,
         .bias = 0.0,
         .size = 9,
-        .filter = _copy_filter_matrix(9, motion_blur_filter_matrix),
+        .filter = copy_filter_matrix(9, motion_blur_filter_matrix),
     };
 
     filters[edges_filter_type] = (struct filter){
         .factor = 1.0,
         .bias = 0.0,
         .size = 5,
-        .filter = _copy_filter_matrix(5, edges_filter_matrix),
+        .filter = copy_filter_matrix(5, edges_filter_matrix),
     };
 
     filters[sharpen_filter_type] = (struct filter){
         .factor = 1.0,
         .bias = 0.0,
         .size = 3,
-        .filter = _copy_filter_matrix(3, sharpen_filter_matrix),
+        .filter = copy_filter_matrix(3, sharpen_filter_matrix),
     };
 
     return filters;
@@ -107,7 +107,7 @@ struct filter* init_filters() {
 
 void free_filters(struct filter* filters) {
     for (size_t i = 0; i < FILTERS_NUM; i++) {
-        _free_filter_matrix(&filters[i]);
+        free_filter_matrix(&filters[i]);
     }
 
     free(filters);

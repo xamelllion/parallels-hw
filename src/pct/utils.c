@@ -1,4 +1,3 @@
-#include <time.h>
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
@@ -6,9 +5,9 @@
 #include "stb_image_write.h"
 
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 
-#include <pct/filters.h>
 #include <pct/utils.h>
 
 struct image_info load_image(const char* read_path) {
