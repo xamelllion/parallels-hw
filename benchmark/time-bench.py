@@ -6,29 +6,35 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
 import os
+import numpy as np
 
-def run_benchmark(args):
-    modes = ['seq', 'pixel', 'row', 'column', 'grid']
-    filters = ['id', 'bl', 'mb', 'ed', 'sr']
+ARGS = {
+    'input': 'examples/image.png',
+    'output_dir': 'benchmark/plots',
+    'threads': 8,
+    'runs': 5,
+}
+
+MODES = ['seq', 'pixel', 'row', 'column', 'grid']
+FILTERS = ['id', 'bl', 'mb', 'ed', 'sr']
+
+def run_benchmark():
     results = []
     
-    total_combinations = len(modes) * len(filters) * args['runs']
+    total_combinations = len(MODES) * len(FILTERS) * ARGS['runs']
     progress = tqdm(total=total_combinations, desc="Benchmarking")
 
-    os.makedirs('/tmp/pct/', exist_ok=True)
-
-    for mode in modes:
-        for fltr in filters:
+    for mode in MODES:
+        for fltr in FILTERS:
             times = []
-            for _ in range(args['runs']):
-                output_file = f"/tmp/pct/pct_out_{mode}_{fltr}_{time.time()}.jpg"
+            for _ in range(ARGS['runs']):
                 cmd = [
                     './build/src/pct',
-                    '-i', args['input'],
-                    '-o', output_file,
+                    '-i', ARGS['input'],
+                    '-o', "/dev/null",
                     '-f', fltr,
                     '-m', mode,
-                    '-t', str(args['threads']) if mode != 'seq' else '1',
+                    '-t', str(ARGS['threads']) if mode != 'seq' else '1',
                     '--log'
                 ]
 
@@ -45,11 +51,14 @@ def run_benchmark(args):
                     progress.update(1)
 
             if times:
-                avg_time = sum(times) / len(times)
+                mean_time = np.mean(times)
+                std_error = np.std(times, ddof=1)
                 results.append({
                     'Mode': mode.upper(),
                     'Filter': fltr.upper(),
-                    'Time (s)': avg_time
+                    'Time (s)': f"{mean_time:.4f} ± {std_error:.4f}",
+                    '_mean': mean_time,
+                    '_error': std_error
                 })
 
     progress.close()
@@ -59,15 +68,15 @@ def plot_results(df, output_dir):
     sns.set_style("whitegrid")
     os.makedirs(output_dir, exist_ok=True)
 
-    filters = df['Filter'].unique()
-    for fltr in filters:
+    FILTERS = df['Filter'].unique()
+    for fltr in FILTERS:
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(
             data=df[df['Filter'] == fltr],
             x='Mode',
-            y='Time (s)',
+            y='_mean',
             palette="rocket",
-            errorbar=None,
+            errorbar=('ci', 68),
             hue='Mode',
             legend=False
         )
@@ -76,9 +85,10 @@ def plot_results(df, output_dir):
         plt.xlabel("Processing Mode")
         plt.ylabel("Execution Time (s)")
         
-        for p in ax.patches:
+        for i, p in enumerate(ax.patches):
+            row = df[(df['Filter'] == fltr)].iloc[i]
             ax.annotate(
-                f"{p.get_height():.2f}",
+                f"{row['Time (s)']}",
                 (p.get_x() + p.get_width() / 2., p.get_height()),
                 ha='center', va='center',
                 xytext=(0, 5),
@@ -91,25 +101,22 @@ def plot_results(df, output_dir):
         plt.close()
         print(f"Saved {fltr} plot to {output_path}")
 
-if __name__ == "__main__":
-    args = {
-        'input': 'examples/image.png',
-        'output_dir': 'benchmark/plots',
-        'threads': 4,
-        'runs': 1,
-    }
-    
+if __name__ == "__main__":    
     print(f"Starting benchmark with configuration:")
-    print(f"  Input image: {args['input']}")
-    print(f"  Threads: {args['threads']}")
-    print(f"  Runs per config: {args['runs']}")
-    print(f"  Output directory: {args['output_dir']}\n")
+    print(f"  Input image: {ARGS['input']}")
+    print(f"  Threads: {ARGS['threads']}")
+    print(f"  Runs per config: {ARGS['runs']}")
+    print(f"  Output directory: {ARGS['output_dir']}\n")
     
-    results_df = run_benchmark(args)
+    results_df = run_benchmark()
     
     if not results_df.empty:
-        plot_results(results_df, args['output_dir'])
+        plot_results(results_df, ARGS['output_dir'])
         print("\nFinal Results:")
-        print(results_df.to_markdown(index=False))
+        print(results_df[['Mode', 'Filter', 'Time (s)']].to_markdown(index=False))
+
+        with open('benchmark/result.txt', 'w')  as f:
+            f.write('Final Results:\n')
+            f.write(f'{results_df[['Mode', 'Filter', 'Time (s)']].to_markdown(index=False)}\n')
     else:
         print("\nNo valid results collected.")

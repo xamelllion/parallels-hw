@@ -168,11 +168,9 @@ void grid_convolution(struct image_info* info, struct filter filter, int num_thr
     int w = info->width;
     int h = info->height;
 
-    // Вычисляем оптимальное разделение на прямоугольники
     int grid_width = 1;
     int grid_height = num_threads;
 
-    // Ищем наиболее квадратное разбиение
     for (int i = 1; i <= num_threads; i++) {
         if (num_threads % i == 0) {
             int other = num_threads / i;
