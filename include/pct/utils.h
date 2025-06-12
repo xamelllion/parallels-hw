@@ -76,6 +76,9 @@ struct pct_options {
     enum pct_mode mode;                ///< Processing mode
     int threads;                       ///< Number of threads to use
     int log;                           ///< Logging status
+    int queue;                         ///< Work with multiple images flag
+    char** image_paths;                ///< Array of image paths for queue mode
+    int image_count;                   ///< Number of images in queue mode
 };
 
 /**

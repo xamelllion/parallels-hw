@@ -14,6 +14,9 @@ PCT - image processing tool that applies convolution filters to images using var
   - Row-level parallelism
   - Column-level parallelism
   - Grid-based parallelism
+- Batch processing:
+  - Process multiple images in queue mode
+  - Support for multiple input files
 - Supported filters:
   - Identity (no change)
   - Blur (smoothing)
@@ -47,8 +50,16 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild
 
 ## Usage
 
+### Single Image Processing
+
 ```bash
 ./build/src/pct [OPTIONS]
+```
+
+### Batch Processing (Queue Mode)
+
+```bash
+./build/src/pct --queue [OPTIONS] image1.png image2.png image3.png ...
 ```
 
 ### Options
@@ -56,11 +67,13 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild
 | Short | Long            | Description                          | Values                      |
 |-------|-----------------|--------------------------------------|-----------------------------|
 | `-h`  | `--help`        | Show help message                    |                             |
-| `-i`  | `--input`       | Input image path                     | Any valid image file        |
-| `-o`  | `--output`      | Output image path                    | Desired output path         |
+| `-i`  | `--input`       | Input image path (single image mode) | Any valid image file        |
+| `-o`  | `--output`      | Output path (file or directory)      | File path or directory      |
 | `-f`  | `--filter`      | Filter to apply                      | `id`, `bl`, `mb`, `ed`, `sr`|
 | `-m`  | `--mode`        | Processing mode                      | `seq`, `pixel`, `row`, `column`, `grid`|
 | `-t`  | `--threads`     | Number of threads to use             | Positive integer            |
+| `-l`  | `--log`         | Enable logging                       | Boolean flag                |
+| `-q`  | `--queue`       | Batch processing mode                | Boolean flag                |
 
 ### Filter Types
 
@@ -82,7 +95,23 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild
 | `column`| Parallel processing per-column           |
 | `grid`  | Parallel processing using 2D grid        |
 
+### Working Modes
+
+#### Single Image Mode
+- Use `-i` flag to specify input image
+- Use `-o` flag to specify output file path
+- Process one image at a time
+
+#### Queue Mode (`-q` flag)
+- Specify multiple input images as positional arguments
+- Use `-o` flag to specify output directory
+- All images will be processed with the same filter and mode settings
+- Output files will have the same names as input files in the specified directory
+- Useful for batch processing multiple images with identical settings
+
 ## Examples
+
+### Single Image Processing
 
 1. Apply blur filter with row-level parallelization using 4 threads:
    ```bash
@@ -92,6 +121,18 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild
 2. Detect edges using grid mode with automatic thread count:
    ```bash
    ./build/src/pct -i photo.png -o edges.png -f ed -m grid
+   ```
+
+3. Sharpen image with logging enabled:
+   ```bash
+   ./build/src/pct -i photo.jpg -o sharp.jpg -f sr -m pixel -l
+   ```
+
+### Batch Processing
+
+1. Process multiple images with blur filter:
+   ```bash
+   ./build/src/pct -q -o ./processed -f bl -m row -t 4 image1.png image2.png image3.png
    ```
 
 ## Testing
